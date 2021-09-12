@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Page Title</title>
+        <title>Stock Management</title>
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
         <link rel="stylesheet" href="css/styles.css">
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -15,7 +15,7 @@
                     <div class="form-content">
                         <div class="form-group">
                             <label for="productCode-select">Select a product code</label>
-                            <select class="form-control" id="product">
+                            <select class="form-control" id="product" required>
                                 <option selected value="">--Select--</option>
                                 <option value="product1">PRODUCT1</option>
                                 <option value="product2">PRODUCT2</option>
@@ -29,6 +29,7 @@
                             name="items"
                             id="items"
                             placeholder="Enter number"
+                            required
                             >
                         </div>
                         <div class="form-group">
@@ -39,6 +40,7 @@
                             name="itemPrice"
                             id="itemPrice"
                             placeholder="Enter Price for item"
+                            required
                             >
                         </div>
                     </div>
@@ -55,7 +57,7 @@
                     <div class="form-content">
                         <div class="form-group">
                             <label for="productRemove">Select a product code</label>
-                            <select class="form-control" id="productRemove">
+                            <select class="form-control" id="productRemove" required>
                                 <option selected value="">--Select--</option>
                                 <option value="product1">PRODUCT1</option>
                                 <option value="product2">PRODUCT2</option>
@@ -69,6 +71,7 @@
                             name="email"
                             id="email"
                             placeholder="test@test.com"
+                            required
                             >
                         </div>
                         <div class="form-group">
@@ -78,6 +81,7 @@
                             name="itemsBought"
                             id="itemsBought"
                             placeholder="Number of items bought"
+                            required
                             >
                         </div>
                     </div>

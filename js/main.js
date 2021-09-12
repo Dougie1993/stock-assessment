@@ -1,117 +1,66 @@
-const formStock = document.getElementById('formStock');
+const formStock = document.getElementById('formStock'); // add stock form
 const selectedProduct = document.getElementById('product');
 const itemRecieved = document.getElementById('items');
 const itemPrice = document.getElementById('itemPrice');
 
-const formStockRemove = document.getElementById('formStockRemove');
+const formStockRemove = document.getElementById('formStockRemove'); //remove stock form
 const productRemoved = document.getElementById('productRemove');
 const buyerEmail = document.getElementById('email');
 const itemsBought = document.getElementById('itemsBought');
 
 
-var stocks = [];
+var stocks = [];            // container for stocks
+var emailArr = [];          // container for buyer email addressess
+
+onInit = function () {
+    // run when body iniitialises, we are checking stock inventory and updating the display
+    updateStocks();
+}
 
 formStock.addEventListener('submit', (e) => {
     e.preventDefault();
+    // initialise stock object
     let stock = {
+        productCode: '',
         productQuantity: 0,
         productPrice: 0  
     };
+    // assign stock object
     stock.productCode = selectedProduct.value;
     stock.productPrice = parseFloat(itemPrice.value);
     stock.productQuantity = parseInt(itemRecieved.value);
+    if (stock.productCode && stock.productPrice && stock.productQuantity) {
+        findAndUpdateStock(stock);
+        formStock.reset();
+    } else {
+        alert('Please ensure all fields have been filled before adding stock');
+        return false;
+    }
     // check product code if it exist update if not then push into array
     
-    let found = -1;
-    for (let i = 0; i < stocks.length; i++) {
-        if (stocks[i].productCode == stock.productCode) {
-            console.log(stocks[i].productPrice);
-            found = i;
-            // quantity
-            stocks[i].productQuantity = parseInt(stocks[i].productQuantity) + parseInt(stock.productQuantity);
-            // average price
-            stocks[i].productPrice = (stocks[i].productPrice + stock.productPrice) / 2;
-            console.log(stocks[i].productPrice);
-            updateStocks();
-            break;
-        }
-    }
-    
-    console.log(found);
-    if (found !== -1) {
-        console.log('dont push into array');
-        console.log( stocks);
-        updateStocks();
-        return false;
-    } else {
-        stocks.push(stock);
-        updateStocks();
-        
-    }
-        
-    
-    // stocks = [...stocks, stock];
-    found = -1
-    
-    
-    
-    console.log( stocks);
 
 })
 
-var emailArr = [];
-
 formStockRemove.addEventListener('submit', (e) => {
     e.preventDefault();
-    // console.log(stocks);
+    // initialise stock object to be removed
     let removedStock = {
         productCode: '',
         buyerEmail: '',
         itemsBought: 0
     }
+    // assign stock object to be removed
     removedStock.productCode = productRemoved.value;
     removedStock.buyerEmail = buyerEmail.value;
     removedStock.itemsBought = itemsBought.value;
-    console.log(removedStock.buyerEmail);
-    // check if email is in array if so disaalow transaction else push into the array
-    let found = -1;
-    for (let i = 0; i < emailArr.length; i++) {
-        if (emailArr[i] === removedStock.buyerEmail) {
-            console.log('email already exists');
-            found = 1;
-            alert('The customer has exceeded the buying limit');
-            // clear the input fields
-            return false;
-        }
-        
-    }
-    console.log (found);
-    if (found === -1) {
-        console.log('we are adding to arraying');
-        emailArr.push(removedStock.buyerEmail);
-        // find product and subract the quantity
-        console.log(removedStock);
-        let foundProduct = -1;
-        for (let i = 0; i < stocks.length; i++) {
-            if (stocks[i].productCode === removedStock.productCode) {
-                foundProduct = 1;
-                if (stocks[i].productQuantity >= removedStock.itemsBought) {
-                    stocks[i].productQuantity = parseInt(stocks[i].productQuantity) - parseInt(removedStock.itemsBought);
-                } else {
-                    alert('There are less products in inventory than the requested sale');
-                    return false;
-                }   
-                //check if we still have them in stock
-            }
-        }
-    }
+    // check if email is in array if so disallow transaction else push into the array
+    findEmailandUpdate(removedStock);
+    formStockRemove.reset();
 
-    console.log(emailArr);
-    console.log(stocks);
 })
 
 updateStocks = function () {
-    console.log('stocks to display' , stocks);
+    // update the stocks container and display inventory
     for (let i = 0; i < stocks.length; i++) {
         if (stocks[i].productCode === 'product1') {
             document.getElementById("quantityProduct1").innerHTML = stocks[i].productQuantity;
@@ -126,6 +75,87 @@ updateStocks = function () {
     }
 }
 
-onInit = function () {
-    updateStocks();
+
+removeStock = function (removedStock) {
+    // check if the stock to be removed is in inventory
+    if (stocks.length === 0) {
+            alert(`${removedStock.productCode} does not exist in inventory`);
+            return false;
+     }
+    let foundProduct = -1;
+    for (let i = 0; i < stocks.length; i++) {
+        if (stocks[i].productCode === removedStock.productCode) {
+            foundProduct = 1;
+            if (stocks[i].productQuantity >= removedStock.itemsBought) {
+                stocks[i].productQuantity = parseInt(stocks[i].productQuantity) - parseInt(removedStock.itemsBought);
+            } else {
+                alert('There are less products in inventory than the requested sale');
+                return false;
+            }   
+            updateStocks();
+            alert(`${removedStock.productCode} has been succesfully shipped`);
+            return true;
+        } 
+    } 
+
+    if (found === -1) {
+            alert(`${removedStock.productCode} does not exist in inventory`);
+            return false;
+    }
+
+}
+
+findEmailandUpdate = function (removedStock) {
+    // here we check if this is a 1st time buyer if so we then update inventory after buy
+    let foundEmail = -1;
+    for (let i = 0; i < emailArr.length; i++) {
+        if (emailArr[i] === removedStock.buyerEmail) {
+            foundEmail = 1;
+            alert('The customer has exceeded the buying limit');
+            // clear the input fields
+            return false;
+        }       
+    }
+
+    if (foundEmail === -1) {
+        // find product and subract the quantity
+        
+        if(removeStock(removedStock)) {
+            //update email container
+            emailArr.push(removedStock.buyerEmail);
+        } else {
+            return false;
+        }
+
+        
+            
+    }
+}
+
+findAndUpdateStock = function (stock) {
+    let found = -1;
+    for (let i = 0; i < stocks.length; i++) {
+        if (stocks[i].productCode == stock.productCode) {
+            found = 1;
+            // quantity
+            stocks[i].productQuantity = parseInt(stocks[i].productQuantity) + parseInt(stock.productQuantity);
+            // average price
+            stocks[i].productPrice = (stocks[i].productPrice + stock.productPrice) / 2;
+            updateStocks();
+            break;
+        }
+    }
+    
+    if (found !== -1) {
+        updateStocks();
+        alert(`${stock.productCode} has been updated in the inventory`);
+        return false;
+    } else {
+        stocks.push(stock);
+        updateStocks();
+        alert(`${stock.productCode} has been added to inventory`);
+        
+    }
+
+    found = -1
 }
